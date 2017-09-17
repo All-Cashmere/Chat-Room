@@ -1,0 +1,19 @@
+{
+  "name": "chat-room",
+  "version": "1.0.0",
+  "dependencies": {
+    "body-parser": "^1.18.0",
+    "express": "~4.15.2",
+    "node-env-file": "^0.1.8",
+    "path": "^0.12.7",
+    "pug": "~2.0.0-rc.3",
+    "redis": "^2.8.0",
+    "socket.io": "^2.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  },
+  "scripts": {
+    "start": "nodemon ./app.js"
+  }
+}
