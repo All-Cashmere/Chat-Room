@@ -62,6 +62,6 @@ client().then(
         });
     },
     err => {
-        console.log(`Redis connection failed: ${err}`);
+        console.log("Redis connection failed: ", err);
     }
 );
