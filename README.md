@@ -61,7 +61,7 @@ npm babel-cli babel-preset-env nodemon  --save-dev
  
  Create a folder `lib` in your project root folder and create a file named redis.js, i.e `lib/redis.js` and copy the code below:
  
- ```js
+```js
 "use strict";
 
 import redis from "redis";
@@ -104,7 +104,7 @@ The client will be used to publish messages, subscribe to channels and listen fo
 
 Awesome right?!
 
-### Helper Functions
+### Helper Functions ###
 
 Now, we are going to declare and export some functions that we will use later during this tutorial. The reason why we are creating this helper functions, is to make our code base more readable and well organised. Our helper functions are going to help communicate with Redis to perform various actions which include
 
@@ -298,6 +298,7 @@ let fetchUsers = () => {
         }
     );
 };
+
 ```
 
 In the code snippet above, we did the following
@@ -328,6 +329,7 @@ export let users = router.get("/users", (req, res) => {
         res.send(u);
     });
 });
+
 ```
 
 In the code snippet above, we created and exported the routes for the following
@@ -340,6 +342,7 @@ In the code snippet above, we created and exported the routes for the following
 Let's create more routes that will be needed in the app, paste the code snippet below to `routes.js`
 
 ```js
+
 export let createUser = router.post("/user", (req, res) => {
     let users;
     let user = req.body.user;
@@ -468,7 +471,9 @@ export let createMessage = router.post("/message", (req, res) => {
         }
     );
 });
+
 ```
+
 In the code snippet above, we created and exported the routes for the following
 
 - Creating a user
@@ -517,6 +522,7 @@ app.use(
         extended: true
     })
 );
+
 ```
 In the code snippet above, we did the following
 
@@ -571,6 +577,7 @@ client().then(
         console.log("Redis connection failed: ", err);
     }
 );
+
 ```
 We subscribed to two channels: `chatMessages` and `activeUsers`. Whenever a message is published, an event `message` is triggered. In the code snippet above, we did the following
  
@@ -592,6 +599,7 @@ The POST `/user` endpoint handles adding users to active users. The POST `/messa
 Remember we said something about Pug (formerly known as Jade) earlier on? Yes! We are using it as our view template engine, alongside CSS & JQuery to build the front end client for the chat room.
 
 Create a folder views and a file in it master.pug so that the path is views/master.pug. This file will be the parent template, which other child templates will inherit. Copy the code snippet below:
+
 ```jade
 doctype html
 html
@@ -606,10 +614,13 @@ html
         script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js')
         script(src='/js/script.js')
         block script
+        
 ```
+
 When we extend this file, we can override specific areas labeled blocks. In the code snippet above, we have two blocks: contentand script. We will be extending the file in our child templates using those blocks. Also, Pug relies on indentation to create parent and child elements; therefore, we have to pay attention to that. You can check out pug's documentation.
 
 Next, we create index.pug, the template file we called in our GET /endpoint. It will hold the structure of the homepage. Copy the code snippet below:
+
 ```jade
 extends master
 
@@ -625,6 +636,7 @@ block content
 In the code snippet above, we are extending master.pug and overriding the block content to hold the structure we want. For the homepage, we are going to display a form to collect the username and submit it.
 
 Next, let’s create the template file for the chat room, create file room.pug and paste the code snippet below:
+
 ```jade
 extends master
 
@@ -643,10 +655,12 @@ block content
 block script
     script(src='/socket.io/socket.io.js')
     script(src='../js/chat.js')
+    
 ```
 Here, we added the socket.io script and the script handling the room, by overriding the block script.
 
 Next, we need to style the structure we have defined above. Create a stylesheet style.css in public/css, so that the path is public/css/style.css and paste below into it:
+
 ```css
 *{
     padding: 0;
@@ -842,6 +856,7 @@ h1{
     vertical-align: bottom;
     transition: all ease 500ms;
 }
+
 ```
 Finally, we need make our username registration form and chat room work. We are going to make this possible by using jQuery; a javascript library, to make requests to the endpoints.
 
@@ -873,24 +888,28 @@ $(document).ready(function(){
             });
     });
 });
+
 ```
 
 Once the user submits the form, a POST request is sent to /userwith the username. If the response status is 200, we redirect to the chat room, else, we display a message that disappears after 2 seconds.
 
 Next, let’s power our chat room. We need to display the chat history, active users, update the message wall when another user sends a message and also update the users list when a user joins or leave. Create a file chat.js in public/js folder and copy the code snippet below:
-```js
-$(document).ready(function(){
 
-    var socket = io();
+```js
+$(document).ready(function () {
+
+    const socket = io();
 
     //Get the chat history
     $.get('/messages')
-        .done(function(res){
-            $.each(res, function(index, value){
-                if(value.user === 'system'){
-                    $('.chat').append('<p class="item"><span class="system">'+value.user+': </span><span class="msg">'+value.message+'</span></p>');
-                }else{
-                    $('.chat').append('<p class="item"><span class="user">'+value.user+': </span><span class="msg">'+value.message+'</span></p>');
+        .done(function (res) {
+            $.each(res, function (index, value) {
+                value = JSON.parse(value);
+                console.log(value);
+                if (value.user === 'system') {
+                    $('.chat').append('<p class="item"><span class="system">' + value.user + ': </span><span class="msg">' + value.message + '</span></p>');
+                } else {
+                    $('.chat').append('<p class="item"><span class="user">' + value.user + ': </span><span class="msg">' + value.message + '</span></p>');
                 }
             });
 
@@ -899,23 +918,23 @@ $(document).ready(function(){
 
     //Get the list of all active users
     $.get('/users')
-        .done(function(res){
-            $.each(res, function(index, value){
-                $('.users').append('<p class="item">'+value+'</span>');
+        .done(function (res) {
+            $.each(res, function (index, value) {
+                $('.users').append('<p class="item">' + value + '</span>');
             });
         });
 
     //Message box submission using the 'Enter' key
-    $('.room .message').on("keydown", function(e){
+    $('.room .message').on("keydown", function (e) {
 
-        if(e.keyCode === 13){
+        if (e.keyCode === 13) {
             e.preventDefault();
 
-            var user = $('.name').val();
-            var msg = $('.message').val();
+            let user = $('.name').val();
+            let msg = $('.message').val();
 
             $.post('/message', {user: user, msg: msg})
-                .done(function(){
+                .done(function () {
                     $('.message').val('');
                     $('.submit').prop('disabled', false);
                 });
@@ -924,57 +943,58 @@ $(document).ready(function(){
     });
 
     //Message box submission
-    $('.room').on("submit", function(e){
+    $('.room').on("submit", function (e) {
         e.preventDefault();
 
-        var user = $('.name').val();
-        var msg = $('.message').val();
+        let user = $('.name').val();
+        let msg = $('.message').val();
 
         $.post('/message', {user: user, msg: msg})
-            .done(function(){
+            .done(function () {
                 $('.message').val('');
                 $('.submit').prop('disabled', false);
             });
     });
 
     //Remove user from active user list just before closing the window
-    window.onbeforeunload = function(){
+    window.onbeforeunload = function () {
         $.ajax({
             method: 'DELETE',
             url: '/user',
-            data: { user: $('.name').val()}
+            data: {user: $('.name').val()}
         })
-            .done(function( msg ) {
-                alert( msg.message);
+            .done(function (msg) {
+                alert(msg.message);
             });
 
         return null;
     };
 
     //Listens to when a chat message is broadcasted and displays it
-    socket.on('message', function(data) {
+    socket.on('message', function (data) {
         console.log(data);
-        var username = data.user;
-        var message = data.message;
-        if(username === 'system'){
-            $('.chat').append('<p class="item"><span class="system">'+username+': </span><span class="msg">'+message+'</span></p>');
-        }else{
-            $('.chat').append('<p class="item"><span class="user">'+username+': </span><span class="msg">'+message+'</span></p>');
+        let username = data.user;
+        let message = data.message;
+        if (username === 'system') {
+            $('.chat').append('<p class="item"><span class="system">' + username + ': </span><span class="msg">' + message + '</span></p>');
+        } else {
+            $('.chat').append('<p class="item"><span class="user">' + username + ': </span><span class="msg">' + message + '</span></p>');
         }
 
         $('.chat').animate({'scrollTop': 999999}, 200);
     });
 
     //Listens to when the active user list is updated and broadcasted
-    socket.on('users', function(data) {
+    socket.on('users', function (data) {
         $('.users .item').remove();
 
-        $.each(data, function(index, value){
-            $('.users').append('<p class="item">'+value+'</span>');
+        $.each(data, function (index, value) {
+            $('.users').append('<p class="item">' + value + '</span>');
         });
     });
 });
-``` 
+
+```
 
 In the code snippet above, we did the following
 
@@ -993,16 +1013,20 @@ Our chat room is now ready for deployment!
 Before we deploy the application for usage, we need to quickly edit package.json in the root folder, so that we can start the app automatically, when we deploy. Add this to the file:
 
 ```text
-"scripts" : {
- "start": "nodemon ./app.js"
+"scripts": {
+    "babel-node": "babel-node --presets=env",
+    "start": "nodemon --exec npm run babel-node -- ./server/server.js"
 }
+
 ```
 
 Finally, time to deploy! We will use a simple tool called now by Zeit. Let’s quickly install this, run this in your terminal:
 
 ```bash
 npm install -g now
+
 ```
+
 Once the installation is done, navigate to the project root folder in your terminal and run the now command. If it is your first time, you will be prompted to create an account. Once you are done, run the now command again, a URL will be generated and your project files uploaded.
 
 *insert image*

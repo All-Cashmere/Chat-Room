@@ -32,8 +32,8 @@ $(document).ready(function () {
         if (e.keyCode === 13) {
             e.preventDefault();
 
-            var user = $('.name').val();
-            var msg = $('.message').val();
+            let user = $('.name').val();
+            let msg = $('.message').val();
 
             $.post('/message', {user: user, msg: msg})
                 .done(function () {
@@ -48,8 +48,8 @@ $(document).ready(function () {
     $('.room').on("submit", function (e) {
         e.preventDefault();
 
-        var user = $('.name').val();
-        var msg = $('.message').val();
+        let user = $('.name').val();
+        let msg = $('.message').val();
 
         $.post('/message', {user: user, msg: msg})
             .done(function () {
@@ -75,8 +75,8 @@ $(document).ready(function () {
     //Listens to when a chat message is broadcasted and displays it
     socket.on('message', function (data) {
         console.log(data);
-        var username = data.user;
-        var message = data.message;
+        let username = data.user;
+        let message = data.message;
         if (username === 'system') {
             $('.chat').append('<p class="item"><span class="system">' + username + ': </span><span class="msg">' + message + '</span></p>');
         } else {
