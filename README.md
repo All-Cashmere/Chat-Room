@@ -48,7 +48,7 @@ To get started, we are going to install some node modules to get the chat room r
 
 ```bash
 npm install bluebird body-parser express node-env-file path pug redis socket.io --save
-npm babel-cli babel-preset-env nodemon  --save-dev
+npm install babel-cli babel-preset-env nodemon  --save-dev
 ```
 
  The command above will install ExpressJS framework, Redis client, Bluebird to promisify the Redis client, Socket.io, Pug as view template engine, node-env-file to configure environment file (.env) and body-parser to parse body requests, especially for POST methods.
